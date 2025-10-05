@@ -132,6 +132,18 @@ if ! sudo -u servup mkdir -p /var/lib/servup/remote; then
     show_err "could not create the ServUP directory for the remote files."
 fi
 
+# Check if iptables is installed
+if command_exists iptables; then
+    # Prompt the user to install the firewall tool
+    read -p "It seems that you have iptables installed. Do you want to add the Github Actions IPs to the firewall using our tool? (y/N): " answer
+    
+    if [[ "$answer" =~ ^[Yy]$ ]]; then
+        if ! sh -c "$(curl -fsSL https://raw.githubusercontent.com/S2009-dev/ServUP/main/tools/firewall.sh)"; then 
+           show_err "failed to install our firewall tool. You can install it manually with 'sh -c \"\$(curl -fsSL https://raw.githubusercontent.com/S2009-dev/ServUP/main/tools/firewall.sh)\"'"
+        fi
+    fi
+fi
+
 # Finish installation
 echo "\n\n\033[1;32mInstallation completed successfully!\033[0m"
 echo "SSH Port: $port"
