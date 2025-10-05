@@ -149,9 +149,20 @@ if command_exists iptables; then
             fi
         elif [ -f "/etc/bash.bashrc" ]; then
             if ! sudo echo "alias servup-firewall='sh -c \"\$(curl -fsSL https://raw.githubusercontent.com/S2009-dev/ServUP/main/tools/firewall.sh)\"'" >> /etc/bash.bashrc; then
-              show_err "could not add the firewall tool alias to /etc/zsh/zprofile."
+              show_err "could not add the firewall tool alias to /etc/bash.bashrc."
             fi
         fi
+    fi
+fi
+
+# Add alias to the uninstaller 
+if [ -f "/etc/zsh/zprofile" ]; then
+    if ! sudo echo "alias servup-uninstall='sh -c \"\$(curl -fsSL https://raw.githubusercontent.com/S2009-dev/ServUP/main/tools/uninstall.sh)\"'" >> /etc/zsh/zprofile; then
+        show_err "could not add the uninstaller alias to /etc/zsh/zprofile."
+    fi
+elif [ -f "/etc/bash.bashrc" ]; then
+    if ! sudo echo "alias servup-uninstall='sh -c \"\$(curl -fsSL https://raw.githubusercontent.com/S2009-dev/ServUP/main/tools/uninstall.sh)\"'" >> /etc/bash.bashrc; then
+        show_err "could not add the uninstaller alias to /etc/bash.bashrc."
     fi
 fi
 
