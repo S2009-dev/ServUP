@@ -160,9 +160,15 @@ if [ -f "/etc/zsh/zprofile" ]; then
     if ! sudo echo "alias servup-uninstall='sh -c \"\$(curl -fsSL https://raw.githubusercontent.com/S2009-dev/ServUP/main/tools/uninstall.sh)\"'" >> /etc/zsh/zprofile; then
         show_err "could not add the uninstaller alias to /etc/zsh/zprofile."
     fi
+    if ! sudo source /etc/zsh/zprofile; then
+       show_err "could not apply aliases in /etc/zsh/zprofile."
+    fi
 elif [ -f "/etc/bash.bashrc" ]; then
     if ! sudo echo "alias servup-uninstall='sh -c \"\$(curl -fsSL https://raw.githubusercontent.com/S2009-dev/ServUP/main/tools/uninstall.sh)\"'" >> /etc/bash.bashrc; then
         show_err "could not add the uninstaller alias to /etc/bash.bashrc."
+    fi
+    if ! sudo source /etc/bash.bashrc; then
+       show_err "could not apply aliases in /etc/bash.bashrc."
     fi
 fi
 
