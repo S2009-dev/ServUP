@@ -16,6 +16,14 @@ show_err() {
     printf "\033[0;31mAn error occurred:\033[0m %s\n" "$1" >&2
 }
 
+# Prompt the user to confirm the uninstallation
+read -p "Are you sure you want to uninstall ServUP? (y/N): " answer
+
+if [ "$answer" != "y" ] && [ "$answer" != "Y" ]; then
+    echo "Uninstallation cancelled."
+    exit 0
+fi
+
 # Check if sudo is available
 if ! command_exists sudo; then
     show_err "sudo is not installed. Please install sudo to run this script."
