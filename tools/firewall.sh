@@ -63,9 +63,9 @@ if ! command_exists curl; then
     exit 1
 fi
 
-# Check if iptables or ip6tables is available
-if ! command_exists iptables && ! command_exists ip6tables; then
-    show_err "iptables is not installed. Please install iptables or ip6tables to run this script."
+# Check if iptables is available
+if ! command_exists iptables; then
+    show_err "iptables is not installed. Please install iptables to run this script."
     exit 1
 fi
 
@@ -96,53 +96,27 @@ echo "$response" | jq -r '.actions[]' | while read -r ip; do
     esac
 done
 
-# Check if the script needs to run iptables or ip6tables
-if command_exists iptables; then
-    total_ipv4=$(wc -l < "$ipv4_file")
-    current_ip=0
+total_ipv4=$(wc -l < "$ipv4_file")
+current_ip=0
 
-    echo "Adding Github Actions IPv4 list to the firewall (ServUP SSH port: $port)..."
+echo "Adding Github Actions IPv4 list to the firewall (ServUP SSH port: $port)..."
 
-    # Add IPv4 rules
-    while IFS= read -r ip; do
-        current_ip=$((current_ip + 1))
-        percent=$((current_ip * 100 / total_ipv4))
+# Add IPv4 rules
+while IFS= read -r ip; do
+    current_ip=$((current_ip + 1))
+    percent=$((current_ip * 100 / total_ipv4))
 
-        progress_bar "$percent"
+    progress_bar "$percent"
 
-        if ! sudo /usr/sbin/iptables -A INPUT -p tcp -m tcp --dport "$port" -s "$ip" -j ACCEPT; then
-            show_err "\ncan't add IPv4 rule for $ip."
-        fi
-    done < "$ipv4_file"
-
-    # Save IPv4 rules
-    if ! sudo /usr/sbin/iptables-save > /etc/iptables/rules.v4; then
-        show_err "can't save IPv4 rules."
-        exit 1
+    if ! sudo /usr/sbin/iptables -A INPUT -p tcp -m tcp --dport "$port" -s "$ip" -j ACCEPT; then
+        show_err "\ncan't add IPv4 rule for $ip."
     fi
-else
-    total_ipv6=$(wc -l < "$ipv6_file")
-    current_ip=0
+done < "$ipv4_file"
 
-    echo "Adding Github Actions IPv6 list to the firewall (ServUP SSH port: $port)..."
-
-    # Add IPv6 rules
-    while IFS= read -r ip; do
-        current_ip=$((current_ip + 1))
-        percent=$((current_ip * 100 / total_ipv6))
-
-        progress_bar "$percent"
-
-        if ! sudo /usr/sbin/ip6tables -A INPUT -p tcp -m tcp --dport "$port" -s "$ip" -j ACCEPT; then
-            show_err "\ncan't add IPv6 rule for $ip."
-        fi
-    done < "$ipv6_file"
-
-    # Save IPv6 rules
-    if ! sudo /usr/sbin/iptables-save > /etc/iptables/rules.v6; then
-        show_err "can't save IPv6 rules."
-        exit 1
-    fi
+# Save IPv4 rules
+if ! sudo /usr/sbin/iptables-save > /etc/iptables/rules.v4; then
+    show_err "can't save IPv4 rules."
+    exit 1
 fi
 
 # Cleanup

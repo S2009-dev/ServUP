@@ -23,10 +23,6 @@ on:
           description: 'Run ID of the workflow that generated the artifact'
           required: true
           type: string
-        remote:
-          description: 'Path to the directory where the artifact will be uploaded (ex: /var/lib/servup/remote)'
-          required: true
-          type: string
   workflow_call:
     inputs:
       artifact:
@@ -35,9 +31,6 @@ on:
       run-id:
           required: true
           type: string
-      remote:
-        required: true
-        type: string
 
 jobs:
   servup_deployment:
@@ -62,14 +55,14 @@ jobs:
           ssh -o StrictHostKeyChecking=no \
               -p ${{ secrets.SSH_PORT }} \
               servup@${{ secrets.SSH_HOST }} \
-              "mkdir -p ${{ inputs.remote }}"
+              "mkdir -p /var/lib/servup/remote"
 
       - name: Upload artifact
         run: |
           scp -o StrictHostKeyChecking=no \
               -P ${{ secrets.SSH_PORT }} \
               ${{ inputs.artifact }}.zip \
-              servup@${{ secrets.SSH_HOST }}:${{ inputs.remote }}
+              servup@${{ secrets.SSH_HOST }}:/var/lib/servup/remote
 
       - name: Extract artifact
         run: |
