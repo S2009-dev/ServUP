@@ -141,6 +141,17 @@ if command_exists iptables; then
         if ! sh -c "$(curl -fsSL https://raw.githubusercontent.com/S2009-dev/ServUP/main/tools/firewall.sh)"; then 
            show_err "failed to install our firewall tool. You can install it manually with 'sh -c \"\$(curl -fsSL https://raw.githubusercontent.com/S2009-dev/ServUP/main/tools/firewall.sh)\"'"
         fi
+
+        # Add alias to the firewall tool
+        if [ -f "/etc/zsh/zprofile" ]; then
+            if ! sudo echo "alias servup-firewall='sh -c \"\$(curl -fsSL https://raw.githubusercontent.com/S2009-dev/ServUP/main/tools/firewall.sh)\"'" >> /etc/zsh/zprofile; then
+              show_err "could not add the firewall tool alias to /etc/zsh/zprofile."
+            fi
+        elif [ -f "/etc/bash.bashrc" ]; then
+            if ! sudo echo "alias servup-firewall='sh -c \"\$(curl -fsSL https://raw.githubusercontent.com/S2009-dev/ServUP/main/tools/firewall.sh)\"'" >> /etc/bash.bashrc; then
+              show_err "could not add the firewall tool alias to /etc/zsh/zprofile."
+            fi
+        fi
     fi
 fi
 
