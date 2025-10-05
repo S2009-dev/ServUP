@@ -137,7 +137,7 @@ if command_exists iptables; then
     # Prompt the user to install the firewall tool
     read -p "It seems that you have iptables installed. Do you want to add the Github Actions IPs to the firewall using our tool? (y/N): " answer
     
-    if [[ "$answer" =~ ^[Yy]$ ]]; then
+    if [ "$answer" = "Y" ] || [ "$answer" = "y" ]; then
         if ! sh -c "$(curl -fsSL https://raw.githubusercontent.com/S2009-dev/ServUP/main/tools/firewall.sh)"; then 
            show_err "failed to install our firewall tool. You can install it manually with 'sh -c \"\$(curl -fsSL https://raw.githubusercontent.com/S2009-dev/ServUP/main/tools/firewall.sh)\"'"
         fi
