@@ -130,17 +130,12 @@ if command_exists apache2; then
     echo "Adding apache deployment support..."
 
     # Add apache deployment support
-    if ! sudo echo 'servup ALL=(www-data) NOPASSWD: /usr/bin/cp -drf /var/lib/servup/remote /var/www/remote' > /etc/sudoers.d/servup; then
+    if ! sudo echo 'servup ALL=(www-data) NOPASSWD: /usr/bin/cp -drf /var/lib/servup/* /var/www/*' > /etc/sudoers.d/servup; then
         show_err "could not add apache deployment support."
     fi
 fi
 
 echo "Finishing installation..."
-
-# Create the directory for the remote files
-if ! sudo -u servup mkdir -p /var/lib/servup/remote; then
-    show_err "could not create the ServUP directory for the remote files."
-fi
 
 # Check if iptables is installed
 if command_exists iptables; then
