@@ -35,15 +35,16 @@ on:
 jobs:
   servup_deployment:
     runs-on: ubuntu-latest
+    permissions:
+      actions: read
     steps:
       - name: Download artifact
         uses: actions/download-artifact@v5
         with:
           name: ${{ inputs.artifact }}
-          github-token: ${{ secrets.GH_TOKEN }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
           repository: ${{ github.repository }}
           run-id: ${{ inputs.run-id }}
-
 
       - name: Install SSH key
         uses: webfactory/ssh-agent@v0.7.0
