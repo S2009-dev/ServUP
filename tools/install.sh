@@ -125,6 +125,16 @@ fi
 
 [ "$failed" = 1 ] && show_err "could not restart SSH service. Please restart it manually."
 
+# Check if apache2 is installed
+if command_exists apache2; then
+    echo "Adding apache deployment support..."
+
+    # Add apache deployment support
+    if ! sudo echo 'servup ALL=(www-data) NOPASSWD: /usr/bin/cp -drf /var/lib/servup/remote /var/www/remote' > /etc/sudoers.d/servup; then
+        show_err "could not add apache deployment support."
+    fi
+fi
+
 echo "Finishing installation..."
 
 # Create the directory for the remote files
