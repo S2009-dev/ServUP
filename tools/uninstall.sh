@@ -77,8 +77,8 @@ fi
 
 [ "$failed" = 1 ] && show_err "could not restart SSH service. Please restart it manually."
 
-$UNINSTALL_ALIAS="alias servup-uninstall='sh -c \"\$(curl -fsSL https://raw.githubusercontent.com/S2009-dev/ServUP/main/tools/uninstall.sh)\"'"
-$FIREWALL_ALIAS="alias servup-firewall='sh -c \"\$(curl -fsSL https://raw.githubusercontent.com/S2009-dev/ServUP/main/tools/firewall.sh)\"'"
+$UNINSTALL_ALIAS="alias servup-uninstall='sh -c \"\$(curl -fsSL https:\/\/raw.githubusercontent.com\/S2009-dev\/ServUP\/main\/tools\/uninstall.sh)\"'"
+$FIREWALL_ALIAS="alias servup-firewall='sh -c \"\$(curl -fsSL https:\/\/raw.githubusercontent.com\/S2009-dev\/ServUP\/main\/tools\/firewall.sh)\"'"
 
 # Removing ServUP aliases
 if [ -f "/etc/zsh/zprofile" ]; then
@@ -91,7 +91,7 @@ if [ -f "/etc/zsh/zprofile" ]; then
         show_err "could not remove the firewall tool alias from /etc/zsh/zprofile."
     fi
 
-    if ! sudo source /etc/zsh/zprofile; then
+    if ! source /etc/zsh/zprofile; then
        show_err "could not apply aliases removal in /etc/zsh/zprofile."
     fi
 elif [ -f "/etc/bash.bashrc" ]; then
@@ -103,7 +103,7 @@ elif [ -f "/etc/bash.bashrc" ]; then
         show_err "could not remove the firewall tool alias from /etc/bash.bashrc."
     fi
 
-    if ! sudo source /etc/bash.bashrc; then
+    if ! source /etc/bash.bashrc; then
        show_err "could not apply aliases removal in /etc/bash.bashrc."
     fi
 fi
