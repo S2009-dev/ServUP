@@ -26,7 +26,6 @@ ServUP is a lightweight, open-source, and easy-to-use deployment tool designed t
   - [Repository Configuration](#repository-configuration)
 - [Annexes](#annexes)
   - [Iptables Support](#iptables-support)
-  - [Get a GitHub Token](#get-a-github-token)
 
 ### Features
 
@@ -49,13 +48,12 @@ Ensure that you've copied the ServUP SSH Key given at the end of installation.
 
 If you have a firewall, make sure to open the port given at the end of installation.  
 You can trust only GitHub Actions IPs, they are listed in the `actions` section of the [GitHub meta API](https://api.github.com/meta).  
-We provide a script to help you configure your firewall if you are using `iptables` or `ip6tables`. See [Iptables Support](#iptables-support) for more information.
+We provide a script to help you configure your firewall if you are using `iptables`. See [Iptables Support](#iptables-support) for more information.
 
 ### Repository Configuration
 
 **1. Add the following secrets to your GitHub repository:**
 
-- `GH_TOKEN`: A GitHub token with the `actions:read` permission.
 - `SSH_HOST`: The IP address or domain name of your server.
 - `SSH_PORT`: The port used by ServUP for SSH connections (default: `1424`).
 - `SSH_PRIVATE_KEY`: The private key of the `servup` user on your server.
@@ -69,7 +67,7 @@ Here you will find additional tools and resources to help you use ServUP effecti
 
 ### Iptables Support
 
-If you are using `iptables` or `ip6tables` as your firewall, you can use the following command to open the ServUP SSH port:
+If you are using `iptables` as your firewall, you can use the following command to open the ServUP SSH port:
 
 ```sh
 servup-firewall
@@ -80,17 +78,3 @@ Or if it's not working:
 ```sh
 sh -c "$(curl -fsSL https://raw.githubusercontent.com/S2009-dev/ServUP/main/tools/firewall.sh)"
 ```
-
-### Get a GitHub Token
-
-To get a GitHub token for ServUP, follow these steps:
-
-- Go to [https://github.com/settings/personal-access-tokens/new](https://github.com/settings/personal-access-tokens/new)
-- Choose a name for your token (e.g., `ServUP`).
-- Add a description (optionnal, e.g., `ServUP Deployment Token`).
-- Set the resource owner to your account or organization.
-- Choose the expiration date (recommended: `90 days`).
-- Set the repository access to `All repositories`.
-- Click on `Add permissions` and check `Actions`.
-- Click on `Generate token`.
-- Copy the token and save it in a secure place.
