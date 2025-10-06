@@ -161,10 +161,10 @@ if [ -f "/etc/zsh/zprofile" ]; then
     fi
 
     if ! sudo echo "alias servup-firewall='sh -c \"\$(curl -fsSL https://raw.githubusercontent.com/S2009-dev/ServUP/main/tools/firewall.sh)\"'" >> /etc/zsh/zprofile; then
-              show_err "could not add the firewall tool alias to /etc/zsh/zprofile."
+        show_err "could not add the firewall tool alias to /etc/zsh/zprofile."
     fi
 
-    if ! sudo source /etc/zsh/zprofile; then
+    if ! source /etc/zsh/zprofile; then
        show_err "could not apply aliases in /etc/zsh/zprofile."
     fi
 elif [ -f "/etc/bash.bashrc" ]; then
@@ -176,7 +176,7 @@ elif [ -f "/etc/bash.bashrc" ]; then
         show_err "could not add the firewall tool alias to /etc/bash.bashrc."
     fi
 
-    if ! sudo source /etc/bash.bashrc; then
+    if ! source /etc/bash.bashrc; then
        show_err "could not apply aliases in /etc/bash.bashrc."
     fi
 fi
