@@ -63,7 +63,14 @@ jobs:
          RELEASE_BODY=$(curl -s -H "Authorization: token $GITHUB_TOKEN" \
          "https://api.github.com/repos/${{ github.repository }}/releases/tags/${{ env.TAG_NAME }}" \
          | jq -r '.body')
-         echo "RELEASE_BODY=$RELEASE_BODY" >> $GITHUB_ENV
+
+          RELEASE_BODY="${RELEASE_BODY//'%'/'%25'}"
+          RELEASE_BODY="${RELEASE_BODY//$'\n'/'%0A'}"
+          RELEASE_BODY="${RELEASE_BODY//$'\r'/'%0D'}"
+
+          echo "RELEASE_BODY<<EOF" >> $GITHUB_ENV
+          echo "$RELEASE_BODY" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
 
       - name: Create new beta release
         uses: actions/create-release@v1
