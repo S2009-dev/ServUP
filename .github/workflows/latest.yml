@@ -1,0 +1,88 @@
+name: Release Deployment
+
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  release-deployment:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Extract latest tag name
+        id: tag
+        run: |
+          echo "TAG_NAME=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
+
+      - name: Delete previous 'latest' release
+        if: ! contains(env.TAG_NAME, 'beta')
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          RELEASE_ID=$(curl -s -H "Authorization: token $GITHUB_TOKEN" \
+            "https://api.github.com/repos/${{ github.repository }}/releases/tags/latest" \
+            | jq -r '.id')
+
+          if [ "$RELEASE_ID" != "null" ]; then
+            curl -s -X DELETE -H "Authorization: token $GITHUB_TOKEN" \
+              "https://api.github.com/repos/${{ github.repository }}/releases/$RELEASE_ID"
+            echo "Deleted 'latest' release."
+          else
+            echo "Could not delete 'latest' release."
+          fi
+
+      - name: Delete previous 'latest' tag
+        if: ! contains(env.TAG_NAME, 'beta')
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG_SHA=$(curl -s -H "Authorization: token $GITHUB_TOKEN" \
+            "https://api.github.com/repos/${{ github.repository }}/git/ref/tags/latest" \
+            | jq -r '.object.sha')
+
+          if [ "$TAG_SHA" != "null" ]; then
+            curl -s -X DELETE -H "Authorization: token $GITHUB_TOKEN" \
+              "https://api.github.com/repos/${{ github.repository }}/git/refs/tags/latest"
+            echo "Deleted 'latest' tag."
+          else
+            echo "Could not delete 'latest' tag."
+          fi
+
+      - name: Create new 'latest' tag
+        if: ! contains(env.TAG_NAME, 'beta')
+        run: |
+          git tag latest
+          git push origin latest
+
+      - name: Extract latest release body
+        if: ! contains(env.TAG_NAME, 'beta')
+        env:
+         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+         RELEASE_BODY=$(curl -s -H "Authorization: token $GITHUB_TOKEN" \
+         "https://api.github.com/repos/${{ github.repository }}/releases/tags/${{ env.TAG_NAME }}" \
+         | jq -r '.body')
+
+          RELEASE_BODY="${RELEASE_BODY//'%'/'%25'}"
+          RELEASE_BODY="${RELEASE_BODY//$'\n'/'%0A'}"
+          RELEASE_BODY="${RELEASE_BODY//$'\r'/'%0D'}"
+
+          echo "RELEASE_BODY<<EOF" >> $GITHUB_ENV
+          echo "$RELEASE_BODY" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+
+      - name: Create new 'latest' release
+        if: ! contains(env.TAG_NAME, 'beta')
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: latest
+          release_name: latest
+          body: ${{ env.RELEASE_BODY }}
+          
