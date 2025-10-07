@@ -1,0 +1,77 @@
+name: Beta Deployment
+
+on:
+  push:
+    tags:
+      - '*-beta*'
+
+jobs:
+  beta-deployment:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Delete previous beta release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          RELEASE_ID=$(curl -s -H "Authorization: token $GITHUB_TOKEN" \
+            "https://api.github.com/repos/${{ github.repository }}/releases/tags/beta" \
+            | jq -r '.id')
+
+          if [ "$RELEASE_ID" != "null" ]; then
+            curl -s -X DELETE -H "Authorization: token $GITHUB_TOKEN" \
+              "https://api.github.com/repos/${{ github.repository }}/releases/$RELEASE_ID"
+            echo "Deleted 'beta' release."
+          else
+            echo "Could not delete 'beta' release."
+          fi
+
+      - name: Delete previous beta tag
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG_SHA=$(curl -s -H "Authorization: token $GITHUB_TOKEN" \
+            "https://api.github.com/repos/${{ github.repository }}/git/ref/tags/beta" \
+            | jq -r '.object.sha')
+
+          if [ "$TAG_SHA" != "null" ]; then
+            curl -s -X DELETE -H "Authorization: token $GITHUB_TOKEN" \
+              "https://api.github.com/repos/${{ github.repository }}/git/refs/tags/beta"
+            echo "Deleted 'beta' tag."
+          else
+            echo "Could not delete 'beta' tag."
+          fi
+
+      - name: Create new beta tag
+        run: |
+          git tag beta
+          git push origin beta
+
+      - name: Extract '-beta' tag name
+        id: tag
+        run: |
+          echo "TAG_NAME=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
+
+      - name: Extract '-beta' release body
+        env:
+         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+         RELEASE_BODY=$(curl -s -H "Authorization: token $GITHUB_TOKEN" \
+         "https://api.github.com/repos/${{ github.repository }}/releases/tags/${{ env.TAG_NAME }}" \
+         | jq -r '.body')
+         echo "RELEASE_BODY=$RELEASE_BODY" >> $GITHUB_ENV
+
+      - name: Create new beta release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: beta
+          release_name: beta
+          body: ${{ env.RELEASE_BODY }}
+          prerelease: true
+          
