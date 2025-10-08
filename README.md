@@ -4,7 +4,7 @@
 # Source Code: https://github.com/S2009-dev/ServUP #
 #################################################### -->
 
-# <center>[![ServUp Banner](./src/logo.png)](.)</center>
+# <center>[![ServUp Banner](./src/logo.png)](https://github.com/marketplace/actions/servup-deployment)</center>
 
 ![GitHub Release](https://img.shields.io/github/v/release/S2009-dev/ServUP)
 ![GitHub last commit](https://img.shields.io/github/last-commit/S2009-dev/ServUP)
