@@ -30,89 +30,58 @@ inputs:
     required: true
     type: string
 
-on:
-  workflow_dispatch:
-      inputs:
-        artifact:
-          description: 'Name of the artifact to upload (ex: my-artifact)'
-          required: true
-          type: string
-        run-id:
-          description: 'Run ID of the workflow that generated the artifact'
-          required: true
-          type: string
-        remote:
-          description: 'Path to the remote directory where the artifact will be uploaded (only folders in "/var/lib/servup" are supported)'
-          required: true
-          type: string
-        deploy:
-          description: 'Path to the remote directory where the artifact will be deployed (only folders in "/var/www" are supported yet)'
-          required: true
-          type: string
-  workflow_call:
-    inputs:
-      artifact:
-        required: true
-        type: string
-      run-id:
-          required: true
-          type: string
-      remote:
-          required: true
-          type: string
-      deploy:
-        required: true
-        type: string
-jobs:
-  servup_deployment:
-    runs-on: ubuntu-latest
-    permissions:
-      actions: read
-    steps:
-      - name: Download artifact
-        uses: actions/download-artifact@v5
-        with:
-          name: ${{ inputs.artifact }}
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          repository: ${{ github.repository }}
-          run-id: ${{ inputs.run-id }}
+runs:
+  using: 'composite'
+  steps:
+    - name: Download artifact
+      uses: actions/download-artifact@v5
+      with:
+        name: ${{ inputs.artifact }}
+        github-token: ${{ env.GITHUB_TOKEN }}
+        repository: ${{ github.repository }}
+        run-id: ${{ inputs.run-id }}
 
-      - name: Install SSH key
-        uses: webfactory/ssh-agent@v0.7.0
-        with:
-          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+    - name: Install SSH key
+      uses: webfactory/ssh-agent@v0.7.0
+      with:
+        ssh-private-key: ${{ env.SSH_PRIVATE_KEY }}
 
-      - name: Create remote directory
-        run: |
-          ssh -o StrictHostKeyChecking=no \
-              -p ${{ secrets.SSH_PORT }} \
-              servup@${{ secrets.SSH_HOST }} \
-              "mkdir -p \"${{ inputs.remote }}\""
+    - name: Create remote directory
+      shell: bash
+      run: |
+        ssh -o StrictHostKeyChecking=no \
+            -p ${{ env.SSH_PORT }} \
+            servup@${{ env.SSH_HOST }} \
+            "mkdir -p \"${{ inputs.remote }}\""
 
-      - name: Upload artifact
-        run: |
-          scp -o StrictHostKeyChecking=no \
-              -P ${{ secrets.SSH_PORT }} \
-              ${{ inputs.artifact }}.zip \
-              servup@${{ secrets.SSH_HOST }}:${{ inputs.remote }}
+    - name: Upload artifact
+      shell: bash
+      run: |
+        scp -o StrictHostKeyChecking=no \
+            -P ${{ env.SSH_PORT }} \
+            ${{ inputs.artifact }}.zip \
+            servup@${{ env.SSH_HOST }}:${{ inputs.remote }}
 
-      - name: Extract artifact
-        run: |
-          ssh -o StrictHostKeyChecking=no \
-              -p ${{ secrets.SSH_PORT }} \
-              servup@${{ secrets.SSH_HOST }} \
-              "cd \"${{ inputs.remote }}\" && unzip -o \"${{ inputs.artifact }}\" && rm \"${{ inputs.artifact }}.zip\""
+    - name: Extract artifact
+      shell: bash
+      run: |
+        ssh -o StrictHostKeyChecking=no \
+            -p ${{ env.SSH_PORT }} \
+            servup@${{ env.SSH_HOST }} \
+            "cd \"${{ inputs.remote }}\" && unzip -o \"${{ inputs.artifact }}\" && rm \"${{ inputs.artifact }}.zip\""
 
-      - name: Deploy artifact
-        run: |
-          ssh -o StrictHostKeyChecking=no \
-              -p ${{ secrets.SSH_PORT }} \
-              servup@${{ secrets.SSH_HOST }} \
-              "sudo -u www-data /usr/bin/cp -drf \"${{ inputs.remote }}\" \"${{ inputs.deploy }}\""
+    - name: Deploy artifact
+      shell: bash
+      run: |
+        ssh -o StrictHostKeyChecking=no \
+            -p ${{ env.SSH_PORT }} \
+            servup@${{ env.SSH_HOST }} \
+            "sudo -u www-data /usr/bin/cp -drf \"${{ inputs.remote }}\" \"${{ inputs.deploy }}\""
 
-      - name: Cleanup
-        run: |
-          ssh -o StrictHostKeyChecking=no \
-              -p ${{ secrets.SSH_PORT }} \
-              servup@${{ secrets.SSH_HOST }} \
-              "rm -drf \"${{ inputs.remote }}\""
+    - name: Cleanup
+      shell: bash
+      run: |
+        ssh -o StrictHostKeyChecking=no \
+            -p ${{ env.SSH_PORT }} \
+            servup@${{ env.SSH_HOST }} \
+            "rm -drf \"${{ inputs.remote }}\""
