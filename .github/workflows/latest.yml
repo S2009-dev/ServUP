@@ -3,7 +3,7 @@ name: Release Deployment
 on:
   push:
     tags:
-      - '*'
+      - 'v*'
 
 jobs:
   release-deployment:
@@ -20,7 +20,7 @@ jobs:
           echo "TAG_NAME=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
 
       - name: Delete previous 'latest' release
-        if: ! contains(env.TAG_NAME, 'beta')
+        if: ${{ !contains(env.TAG_NAME, 'beta') }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -37,7 +37,7 @@ jobs:
           fi
 
       - name: Delete previous 'latest' tag
-        if: ! contains(env.TAG_NAME, 'beta')
+        if: ${{ !contains(env.TAG_NAME, 'beta') }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -54,35 +54,30 @@ jobs:
           fi
 
       - name: Create new 'latest' tag
-        if: ! contains(env.TAG_NAME, 'beta')
+        if: ${{ !contains(env.TAG_NAME, 'beta') }}
         run: |
           git tag latest
           git push origin latest
 
-      - name: Extract latest release body
-        if: ! contains(env.TAG_NAME, 'beta')
+      - name: Create new 'latest' release
+        if: ${{ !contains(env.TAG_NAME, 'beta') }}
         env:
          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-         RELEASE_BODY=$(curl -s -H "Authorization: token $GITHUB_TOKEN" \
-         "https://api.github.com/repos/${{ github.repository }}/releases/tags/${{ env.TAG_NAME }}" \
-         | jq -r '.body')
+          RELEASE_BODY=$(curl -s -H "Authorization: token $GITHUB_TOKEN" \
+          "https://api.github.com/repos/${{ github.repository }}/releases/tags/${{ env.TAG_NAME }}" \
+          | jq -r '.body')
 
-          RELEASE_BODY="${RELEASE_BODY//'%'/'%25'}"
-          RELEASE_BODY="${RELEASE_BODY//$'\n'/'%0A'}"
-          RELEASE_BODY="${RELEASE_BODY//$'\r'/'%0D'}"
+          JSON_PAYLOAD=$(jq -n \
+          --arg body "$RELEASE_BODY" \
+          '{
+            "tag_name": "latest",
+            "name": "latest",
+            "body": $body,
+          }')
 
-          echo "RELEASE_BODY<<EOF" >> $GITHUB_ENV
-          echo "$RELEASE_BODY" >> $GITHUB_ENV
-          echo "EOF" >> $GITHUB_ENV
-
-      - name: Create new 'latest' release
-        if: ! contains(env.TAG_NAME, 'beta')
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: latest
-          release_name: latest
-          body: ${{ env.RELEASE_BODY }}
-          
+          curl -s -X POST \
+            -H "Authorization: token $GITHUB_TOKEN" \
+            -H "Accept: application/vnd.github.v3+json" \
+            https://api.github.com/repos/${{ github.repository }}/releases \
+            -d "$JSON_PAYLOAD"
