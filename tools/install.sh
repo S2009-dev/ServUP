@@ -159,7 +159,7 @@ if [ -f "/etc/zsh/zprofile" ]; then
         show_err "could not add the firewall tool alias to /etc/zsh/zprofile."
     fi
 
-    if ! source /etc/zsh/zprofile; then
+    if ! . /etc/zsh/zprofile; then
        show_err "could not apply aliases in /etc/zsh/zprofile."
     fi
 elif [ -f "/etc/bash.bashrc" ]; then
@@ -171,7 +171,7 @@ elif [ -f "/etc/bash.bashrc" ]; then
         show_err "could not add the firewall tool alias to /etc/bash.bashrc."
     fi
 
-    if ! source /etc/bash.bashrc; then
+    if ! . /etc/bash.bashrc; then
        show_err "could not apply aliases in /etc/bash.bashrc."
     fi
 fi
