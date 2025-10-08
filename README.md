@@ -12,30 +12,30 @@
 ![GitHub forks](https://img.shields.io/github/forks/S2009-dev/ServUP)
 ![GitHub Repo stars](https://img.shields.io/github/stars/S2009-dev/ServUP)
 
-## About
+## :information_source: About
 
 ServUP is a lightweight, open-source, and easy-to-use deployment tool designed to simplify the process of deploying artifact from GitHub Actions to remote servers. It provides a simple and efficient way to manage your deployments, ensuring that your applications are always up-to-date and running.
 
-### Index
+### :bookmark_tabs: Index
 
-- [About](#about)
-  - [Index](#index)
-  - [Features](#features)
-- [Installation](#installation)
-  - [Server Configuration](#server-configuration)
-  - [Repository Configuration](#repository-configuration)
-- [Annexes](#annexes)
-  - [Iptables Support](#iptables-support)
+- [About](#information_source-about)
+  - [Index](#bookmark_tabs-index)
+  - [Features](#sparkles-features)
+- [Installation](#gear-installation)
+  - [Server Configuration](#cloud-server-configuration)
+  - [Repository Configuration](#file_folder-repository-configuration)
+- [Annexes](#wrench-annexes)
+  - [Iptables Support](#fire-iptables-support)
 
-### Features
+### :sparkles: Features
 
 ServUP uses SSH to securely transfer files from your GitHub Actions workflow to your remote server.
 
-## Installation
+## :gear: Installation
 
 In order to work with ServUP, you need to do some configuration on your server and your GitHub repository.
 
-### Server Configuration
+### :cloud: Server Configuration
 
 Install ServUP on your server via the command-line with curl:
 
@@ -48,9 +48,9 @@ Ensure that you've copied the ServUP SSH Key given at the end of installation.
 
 If you have a firewall, make sure to open the port given at the end of installation.  
 You can trust only GitHub Actions IPs, they are listed in the `actions` section of the [GitHub meta API](https://api.github.com/meta).  
-We provide a script to help you configure your firewall if you are using `iptables`. See [Iptables Support](#iptables-support) for more information.
+We provide a script to help you configure your firewall if you are using `iptables`. See [Iptables Support](#fire-iptables-support) for more information.
 
-### Repository Configuration
+### :file_folder: Repository Configuration
 
 **1. Add the following secrets to your GitHub repository:**
 
@@ -101,11 +101,11 @@ Replace `<ARTIFACT>`, `<REMOTE>` and `<DEPLOY>` with your own values.
 
 :warning: **Warning:** Currently only apache2 deployment is supported.
 
-## Annexes
+## :wrench: Annexes
 
 Here you will find additional tools and resources to help you use ServUP effectively.
 
-### Iptables Support
+### :fire: Iptables Support
 
 If you are using `iptables` as your firewall, you can use the following command to open the ServUP SSH port:
 
