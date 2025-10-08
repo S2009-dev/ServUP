@@ -12,6 +12,24 @@ branding:
   icon: upload-cloud
   color: blue
 
+inputs:
+  artifact:
+    description: 'Name of the artifact to upload (ex: my-artifact)'
+    required: true
+    type: string
+  run-id:
+    description: 'Run ID of the workflow that generated the artifact'
+    required: true
+    type: string
+  remote:
+    description: 'Path to the remote directory where the artifact will be uploaded (only folders in "/var/lib/servup" are supported)'
+    required: true
+    type: string
+  deploy:
+    description: 'Path to the remote directory where the artifact will be deployed (only folders in "/var/www" are supported yet)'
+    required: true
+    type: string
+
 on:
   workflow_dispatch:
       inputs:
