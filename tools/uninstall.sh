@@ -110,11 +110,6 @@ fi
 
 echo "Removing additional tools..."
 
-# Remove additional tools
-if ! sudo rm -f /etc/sudoers.d/servup; then
-    show_err "could not remove additional tools. Please remove them manually with 'rm -f /etc/sudoers.d/servup'."
-fi
-
 # Finish uninstallation
 echo "\n\033[1;32mUninstallation completed successfully!\033[0m"
 echo "Hope to see you again soon!"
