@@ -68,7 +68,7 @@ runs:
         ssh -o StrictHostKeyChecking=no \
             -p ${{ env.SSH_PORT }} \
             servup@${{ env.SSH_HOST }} \
-            "cd \"${{ inputs.remote }}\" && unzip -o \"${{ inputs.artifact }}\" && rm \"${{ inputs.artifact }}.zip\""
+            "cd \"${{ inputs.remote }}\" && unzip -oq \"${{ inputs.artifact }}\" && rm \"${{ inputs.artifact }}.zip\""
 
     - name: Deploy artifact
       shell: bash
