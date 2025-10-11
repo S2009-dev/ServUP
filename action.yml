@@ -25,8 +25,8 @@ inputs:
     description: 'Path to the remote directory where the artifact will be uploaded (only folders in "/var/lib/servup" are supported)'
     required: true
     type: string
-  deploy:
-    description: 'Path to the remote directory where the artifact will be deployed (only folders in "/var/www" are supported yet)'
+  deploy-cmd:
+    description: 'Command to run after the artifact is uploaded in order to deploy it (see the documentation for more information)'
     required: true
     type: string
 
@@ -76,7 +76,7 @@ runs:
         ssh -o StrictHostKeyChecking=no \
             -p ${{ env.SSH_PORT }} \
             servup@${{ env.SSH_HOST }} \
-            "sudo -u www-data /usr/bin/cp -drf \"${{ inputs.remote }}\" \"${{ inputs.deploy }}\""
+            "${{ inputs.deploy-cmd }}"
 
     - name: Cleanup
       shell: bash
